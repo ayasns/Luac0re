@@ -1,6 +1,5 @@
 import struct
 
-# Configuration
 filename = "BASLUS-20268"
 psu_filename = "BASLUS-20268.psu"
 total_size = 62728
@@ -10,7 +9,6 @@ padding_size = 272
 return_address = 0x01FF01A0
 psu_offset = 0x800
 
-# Read shellcode.bin
 try:
     with open('shellcode.bin', 'rb') as f:
         shellcode = f.read()
@@ -18,7 +16,6 @@ except FileNotFoundError:
     print("Warning: shellcode.bin not found, using empty shellcode")
     shellcode = b''
 
-# Create file buffer (initialized with null bytes)
 buffer = bytearray(total_size)
 
 # Set first byte to 0x07
@@ -55,3 +52,5 @@ except FileNotFoundError:
     print(f"\nError: {psu_filename} not found")
 except Exception as e:
     print(f"\nError writing to PSU: {e}")
+    
+    
