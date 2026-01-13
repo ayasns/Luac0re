@@ -4,13 +4,20 @@ Luac0re is a [mast1c0re](https://cturt.github.io/mast1c0re.html) variation that 
 
 ## Overview
 
-The original [mast1c0re for Okage](https://github.com/McCaulay/mast1c0re) uses PS2 code execution only, which requires the PS2SDK to compile code.  
-Luac0re uses minimal PS2 shellcode to escape ps2emu, then leverages the Lua 5.3 interpreter already embedded in the main executable (originally intended for ps2emu configuration) to simplify code writing and execution.
+- The original [mast1c0re for Okage](https://github.com/McCaulay/mast1c0re) uses PS2 code execution only, which requires the PS2SDK to compile the code.  
+- Luac0re uses minimal PS2 shellcode to escape ps2emu, then leverages the Lua 5.3 interpreter already embedded in the main executable (originally intended for ps2emu configuration) to simplify code writing and execution.
 
 ## Requirements
 
 - PS4 or PS5 console
 - Disc or digital version of *Star Wars Racer Revenge* (USA region, CUSA03474)
+
+## Restriction
+
+- While Luac0re works on every PS4 (current 13.02) and PS5 (current 12.40) firmware
+- From PS5 fw 8.00 sony blocked socket creation with non AF_UNIX domains
+- Which means you cannot use network at PS5 8.00 >=
+- PS4 has no restriction
 
 ## Setup Instructions
 
