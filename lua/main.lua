@@ -1,3 +1,6 @@
+-- Many codes reference from
+-- https://github.com/shahrilnet/remote_lua_loader
+
 require "global"
 require "rop"
 require "memory"
