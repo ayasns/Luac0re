@@ -10,7 +10,7 @@ Luac0re is a [mast1c0re](https://cturt.github.io/mast1c0re.html) variation that 
 ## Requirements
 
 - PS4 or PS5 console
-- Disc or digital version of *Star Wars Racer Revenge* (USA region, CUSA03474)
+- Disc or digital version of *Star Wars Racer Revenge* USA (CUSA03474) or EU (CUSA03492) region  
 
 ## Restriction
 

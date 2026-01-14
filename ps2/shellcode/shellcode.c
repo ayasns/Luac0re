@@ -13,9 +13,14 @@
 #include <tamtypes.h>
 
 #define PS2_MAX_THREADS                255
-#define PS2_SYS_GET_THREAD_ID          0x002F5A90
-#define PS2_SYS_TERMINATE_THREAD       0x002F59F0
-#define PS2_SYS_DELETE_THREAD          0x002F59B0
+
+#define PS2_SYS_GET_THREAD_ID_USA      0x002F5A90
+#define PS2_SYS_TERMINATE_THREAD_USA   0x002F59F0
+#define PS2_SYS_DELETE_THREAD_USA      0x002F59B0
+
+#define PS2_SYS_GET_THREAD_ID_EU       0x002F5FD0
+#define PS2_SYS_TERMINATE_THREAD_EU    0x002F5F30
+#define PS2_SYS_DELETE_THREAD_EU       0x002F5EF0
 
 #define BREAKOUT_BUSY_TIMEOUT          100000
 
@@ -46,9 +51,11 @@ typedef int (*f_get_thread_id)();
 typedef int (*f_terminate_thread)(int thread_id);
 typedef int (*f_delete_thread)(int thread_id);
 
-static f_get_thread_id get_thread_id = (f_get_thread_id)PS2_SYS_GET_THREAD_ID;
-static f_terminate_thread terminate_thread = (f_terminate_thread)PS2_SYS_TERMINATE_THREAD;
-static f_delete_thread delete_thread = (f_delete_thread)PS2_SYS_DELETE_THREAD;
+static f_get_thread_id get_thread_id = NULL;
+static f_terminate_thread terminate_thread = NULL;
+static f_delete_thread delete_thread = NULL;
+
+static int is_region_usa = 1;
 
 // eboot offsets
 static u64 READ_HANDLER = 0x16c700;
@@ -143,6 +150,24 @@ static u64 return_value = 0;
 static u32 user_id = 0;
 
 // ============================================================================
+
+void detect_region() {
+    volatile u8* addr = (volatile u8*)PS2_SYS_GET_THREAD_ID_USA;
+    
+    if (addr[0]==0x2F && addr[1]==0x00 && addr[2]==0x03 && addr[3]==0x24 && addr[4]==0x0C && addr[5]==0x00 && addr[6]==0x00 && addr[7]==0x00) {
+        // USA version
+        is_region_usa = 1;
+        get_thread_id = (f_get_thread_id)PS2_SYS_GET_THREAD_ID_USA;
+        terminate_thread = (f_terminate_thread)PS2_SYS_TERMINATE_THREAD_USA;
+        delete_thread = (f_delete_thread)PS2_SYS_DELETE_THREAD_USA;
+    } else {
+        // EU version
+        is_region_usa = 0;
+        get_thread_id = (f_get_thread_id)PS2_SYS_GET_THREAD_ID_EU;
+        terminate_thread = (f_terminate_thread)PS2_SYS_TERMINATE_THREAD_EU;
+        delete_thread = (f_delete_thread)PS2_SYS_DELETE_THREAD_EU;
+    }
+}
 
 void kill_threads()
 {
@@ -737,7 +762,10 @@ int mount_savedata_readonly() {
         dir_name_struct[i] = 0;
     }
     
-    char save_dir[] = "SLUS-20268";
+    char save_dir_usa[] = "SLUS-20268";
+    char save_dir_eu[] = "SLES-50366";
+    char* save_dir = (is_region_usa == 1) ? save_dir_usa : save_dir_eu;
+    
     for (int i = 0; save_dir[i] != '\0' && i < 31; i++) {
         dir_name_struct[i] = save_dir[i];
     }
@@ -1026,6 +1054,7 @@ void initialize_lua() {
 // ============================================================================
 
 int main() {
+    detect_region();    
     kill_threads();
     
     init_eboot_offsets();
@@ -1035,6 +1064,13 @@ int main() {
     init_fios_offsets();
     
     send_notification("masticore initialized");
+    
+    if (is_region_usa == 1) {
+        send_notification("USA version detected");
+    } else {
+        send_notification("EU version detected");
+    }
+    
     get_userid();
     
     if (mount_savedata_readonly() == -1) {

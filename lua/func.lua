@@ -180,4 +180,5 @@ function init_native_functions()
     sceKernelGetModuleInfoFromAddr   = func_wrap(read64(LIBC_OFFSETS.sceKernelGetModuleInfoFromAddr))
     libc_strerror                    = func_wrap(LIBC_OFFSETS.libc_strerror)
     libc_error                       = func_wrap(read64(LIBC_OFFSETS.libc_error))
+
 end
